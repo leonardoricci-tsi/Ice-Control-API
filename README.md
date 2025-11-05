@@ -1,6 +1,6 @@
 # Central Informação API
 
-API REST construída com [NestJS](https://nestjs.com/) e [Prisma](https://www.prisma.io/) para atender a aplicação Angular do projeto Central Informação. O desenho do banco segue o diagrama compartilhado (usuários, clientes, fornecedores, produtos, pedidos, itens de pedido e movimentações de estoque).
+API REST construída com [NestJS](https://nestjs.com/) e [Prisma](https://www.prisma.io/) para atender a aplicação Angular do projeto Sistema de Pedidos e Gerenciamento de Pedidos. O desenho do banco segue o diagrama compartilhado (usuários, clientes, fornecedores, produtos, pedidos, itens de pedido e movimentações de estoque).
 
 ## Requisitos
 
