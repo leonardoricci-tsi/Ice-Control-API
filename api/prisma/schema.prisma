@@ -1,0 +1,138 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  SELLER
+}
+
+enum OrderStatus {
+  DRAFT
+  OPEN
+  PAID
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CASH
+  CREDIT_CARD
+  DEBIT_CARD
+  PIX
+  BANK_SLIP
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(SELLER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Customer {
+  id        String   @id @default(uuid())
+  name      String
+  document  String   @unique
+  phone     String?
+  email     String?
+  address   String?
+  city      String?
+  state     String?
+  zipcode   String?
+  orders    Order[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Supplier {
+  id        String   @id @default(uuid())
+  name      String
+  cnpj      String   @unique
+  phone     String?
+  email     String?
+  products  Product[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProductCategory {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Product {
+  id          String          @id @default(uuid())
+  name        String
+  sku         String?         @unique
+  price       Decimal         @default(0)
+  cost        Decimal         @default(0)
+  unit        String?
+  minStock    Int             @default(0)
+  currentQty  Int             @default(0)
+  isActive    Boolean         @default(true)
+  categoryId  String
+  supplierId  String?
+  category    ProductCategory @relation(fields: [categoryId], references: [id])
+  supplier    Supplier?       @relation(fields: [supplierId], references: [id])
+  orderItems  OrderItem[]
+  stockMoves  StockMovement[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([categoryId])
+  @@index([supplierId])
+}
+
+model Order {
+  id            String        @id @default(uuid())
+  number        Int           @unique
+  customerId    String
+  status        OrderStatus   @default(DRAFT)
+  total         Decimal       @default(0)
+  paymentMethod PaymentMethod
+  dueDate       DateTime?
+  customer      Customer      @relation(fields: [customerId], references: [id])
+  items         OrderItem[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([customerId])
+}
+
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String
+  productId String
+  qty       Int
+  price     Decimal
+  total     Decimal
+  order     Order   @relation(fields: [orderId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model StockMovement {
+  id          String   @id @default(uuid())
+  productId   String
+  qty         Int
+  reason      String?
+  referenceId String?
+  product     Product  @relation(fields: [productId], references: [id])
+  createdAt   DateTime @default(now())
+
+  @@index([productId])
+}
